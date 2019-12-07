@@ -377,7 +377,7 @@
         gl.uniformMatrix4fv(pmLoc, false, pm);
         glMatrix.mat4.lookAt(vm,
             [camera.x, camera.y, camera.z], // di mana posisi kamera (posisi)
-            [0.0, 0.0, -2.0], // ke mana kamera menghadap (vektor)
+            [0.0, 0.0, 0.0], // ke mana kamera menghadap (vektor)
             [0.0, 1.0, 0.0]  // ke mana arah atas kamera (vektor)
         );
         gl.uniformMatrix4fv(vmLoc, false, vm);
@@ -388,9 +388,9 @@
         mm = glMatrix.mat4.create();
         // glMatrix.mat4.translate(mm, mm, [0.0, 0.0, 0.0]);
 
-        glMatrix.mat4.rotateZ(mm, mm, theta[xAxis]);
+        // glMatrix.mat4.rotateZ(mm, mm, theta[xAxis]);
         glMatrix.mat4.rotateY(mm, mm, theta[yAxis]);
-        glMatrix.mat4.rotateX(mm, mm, theta[zAxis]);
+        glMatrix.mat4.rotateX(mm, mm, theta[xAxis]);
         gl.uniformMatrix4fv(mmLoc, false, mm);
 
         // Perhitungan modelMatrix untuk vektor normal
@@ -450,8 +450,8 @@
             // Menggunakan dx dan dy untuk memutar kubus
             // glMatrix.mat4.rotateY(mm, mm, dx);
             // glMatrix.mat4.rotateX(mm, mm, dy);
-            theta[xAxis] += dx;
-            theta[yAxis] += dy;
+            theta[xAxis] += dy;
+            theta[yAxis] += dx;
         }
         lastx = x;
         lasty = y;
