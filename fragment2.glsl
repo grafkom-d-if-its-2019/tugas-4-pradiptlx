@@ -7,23 +7,43 @@ varying vec2 fTexCoord;
 uniform vec3 diffuseColor;
 uniform vec3 diffusePosition; // Titik sumber cahaya
 uniform vec3 ambientColor;
-
+uniform float shininess;
 uniform sampler2D sampler0;
 
+
 void main() {
+
+  vec4 tex0 = texture2D(sampler0, fTexCoord); // Hasil akhirnya adalah warna (RGBA)
+
+  vec3 ambient = ambientColor * vec3(tex0);
+
+  vec3 lightDirection = diffusePosition - fPosition;
+  lightDirection = normalize(lightDirection);
+
+  vec3 normal = normalize(fNormal);
   
-  // Arah cahaya = lokasi titik verteks - lokasi titik sumber cahaya
-  vec3 diffuseDirection = normalize(diffusePosition - fPosition);
-  // Nilai intensitas cahaya = 
-  //  nilai COS sudut antara arah datang cahaya dengan arah vektor normal =
-  //  dot product dari vektor arah datang cahaya • arah vektor normal
-  float normalDotLight = max(dot(fNormal, diffuseDirection), 0.0);
+  float lightIntensity = dot(normal, lightDirection);
+  lightIntensity = clamp(lightIntensity, 0.0, 1.0);
 
-  // Untuk mendapatkan nilai warna (RGBA) dari tekstur
-  vec4 textureColor = texture2D(sampler0, fTexCoord);
+  vec3 diffuse = vec3(tex0) * lightIntensity;
 
-  vec3 diffuse = diffuseColor * textureColor.rgb * normalDotLight;
-  vec3 ambient = ambientColor * textureColor.rgb;
+  vec3 reflection = 2. * dot(normal, lightDirection) * normal - lightDirection;
 
-  gl_FragColor = vec4(diffuse + ambient, 1.0);
+  vec3 to_camera = -1. * fPosition;
+
+  reflection = normalize(reflection);
+  to_camera = normalize(to_camera);
+  lightIntensity = dot(reflection, to_camera);
+  lightIntensity = clamp(lightIntensity, 0.0, 1.0);
+  lightIntensity = pow(lightIntensity, shininess);
+
+  vec3 specular;
+  if (lightIntensity > 0.0){
+    specular = diffuseColor * lightIntensity;
+    diffuse = diffuse * (1. - lightIntensity);
+  }else{
+    specular = vec3(0., 0., 0.);
+  }
+
+  gl_FragColor = vec4(ambient + diffuse + specular, 1.0);
 }

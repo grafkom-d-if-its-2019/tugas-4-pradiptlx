@@ -2,15 +2,24 @@ precision mediump float;
 
 attribute vec3 vPosition;
 attribute vec3 vColor;
+attribute vec3 vNormal;
+
 varying vec3 fColor;
+varying vec3 fPosition;
+varying vec3 fNormal;
+
 uniform vec3 theta;
 uniform float scale;
 uniform vec3 bounce;
-uniform mat4 modelMatrix, viewMatrix, projectionMatrix;
+
+uniform mat4 modelMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
+uniform mat3 normalMatrix;  // Berperan sebagai modelMatrix-nya vektor normal
 uniform float center;
 
 void main() {
-  fColor = vColor;
+  // fColor = vColor;
 
   // vec2 transform = vec2(-0.5, 0.5);
 
@@ -65,4 +74,7 @@ void main() {
   gl_Position = vec4(vPosition, 1.0)*bounce*scaled;
   gl_Position = projectionMatrix*viewMatrix*to_origin*gl_Position;
 
+  fColor = vColor;
+  fPosition = vec3(modelMatrix * vec4(vPosition, 1.0));
+  fNormal = normalMatrix * vNormal;
 }
