@@ -20,7 +20,7 @@
     var xAdd = 0.02;
     var yAdd = 0.003;
     var zAdd = 0.004;
-    var lineVertices, cubeVertices, cubePoints, cubeColors, cubeVertices, cubeNormals;
+    var lineVertices, cubeVertices, cubePoints, cubeColors, cubeVertices, cubeNormals, textureCoordinates;
     var mm, mmLoc, vm, vmLoc, pm, camera, dc, dcLoc, dd, ddLoc, ac, acLoc, nm, nmLoc;
 
     function resizer() {
@@ -67,18 +67,52 @@
             gl.enableVertexAttribArray(vPosition);
             gl.enableVertexAttribArray(vColor);
         } else if (shape == 'cube') {
+
+            // Tell WebGL we want to affect texture unit 0
+            gl.activeTexture(gl.TEXTURE0);
+
+            // Uniform untuk tekstur
+            var sampler0Loc = gl.getUniformLocation(program2, 'sampler0');
+            gl.uniform1i(sampler0Loc, 0);
+
+            // Create a texture.
+            var texture = gl.createTexture();
+
+            // Asynchronously load an image
+            var image = new Image();
+            const level = 0;
+            const internalFormat = gl.RGBA;
+            const srcFormat = gl.RGBA;
+            const srcType = gl.UNSIGNED_BYTE;
+            image.src = "images/txStainglass.bmp";
+            image.addEventListener('load', function () {
+                // Now that the image has loaded make copy it to the texture.
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, srcFormat, srcType, border = image);
+                gl.generateMipmap(gl.TEXTURE_2D);
+            });
+
+
             var vPosition, vColor;
+            
+            // Texture
+            // const textureCoordBuffer = gl.createBuffer();
+            // gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
+
+            // Cube
             var vertexBufferObjectCube = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferObjectCube);
 
             gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+            // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
+            //     gl.STATIC_DRAW);
 
             vPosition = gl.getAttribLocation(program2, 'vPosition');
-            // vColor = gl.getAttribLocation(program2, 'vColor');
 
             // Cube
             var vNormal = gl.getAttribLocation(program2, 'vNormal');
             var vTexCoord = gl.getAttribLocation(program2, 'vTexCoord');
+
             gl.vertexAttribPointer(
                 vPosition,    // variabel yang memegang posisi attribute di shader
                 3,            // jumlah elemen per atribut
@@ -87,12 +121,11 @@
                 11 * Float32Array.BYTES_PER_ELEMENT, // ukuran byte tiap verteks (overall) 
                 0                                   // offset dari posisi elemen di array
             );
-            // gl.vertexAttribPointer(vColor, 3, gl.FLOAT, gl.FALSE,
-            // 11 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
             gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, gl.FALSE,
                 11 * Float32Array.BYTES_PER_ELEMENT, 6 * Float32Array.BYTES_PER_ELEMENT);
             gl.vertexAttribPointer(vTexCoord, 2, gl.FLOAT, gl.FALSE,
                 11 * Float32Array.BYTES_PER_ELEMENT, 9 * Float32Array.BYTES_PER_ELEMENT);
+            
             gl.enableVertexAttribArray(vPosition);
             // gl.enableVertexAttribArray(vColor);
             gl.enableVertexAttribArray(vNormal);
@@ -258,8 +291,40 @@
             [0.0, 1.0, 0.0], // atas
             []
         ];
+        // textureCoordinates = [
+        //     // Front
+        //     0.0, 0.0,
+        //     1.0, 0.0,
+        //     1.0, 1.0,
+        //     0.0, 1.0,
+        //     // Back
+        //     0.0, 0.0,
+        //     1.0, 0.0,
+        //     1.0, 1.0,
+        //     0.0, 1.0,
+        //     // Top
+        //     0.0, 0.0,
+        //     1.0, 0.0,
+        //     1.0, 1.0,
+        //     0.0, 1.0,
+        //     // Bottom
+        //     0.0, 0.0,
+        //     1.0, 0.0,
+        //     1.0, 1.0,
+        //     0.0, 1.0,
+        //     // Right
+        //     0.0, 0.0,
+        //     1.0, 0.0,
+        //     1.0, 1.0,
+        //     0.0, 1.0,
+        //     // Left
+        //     0.0, 0.0,
+        //     1.0, 0.0,
+        //     1.0, 1.0,
+        //     0.0, 1.0,
+        // ];
 
-        quad(1, 0, 3, 2);
+        // quad(1, 0, 3, 2);
         quad(2, 3, 7, 6);
         quad(3, 0, 4, 7);
         quad(4, 5, 6, 7);
@@ -267,6 +332,7 @@
         quad(6, 5, 1, 2);
 
         console.log(cubeVertices);
+        console.log(cubePoints[2][0]);
 
         // Font
         // gl.useProgram(program);
@@ -335,36 +401,13 @@
     }
 
     function drawCube() {
-        // Definisi untuk matrix view dan projection
-        // var vmLoc = gl.getUniformLocation(program2, 'viewMatrix');
-        // var vm = glMatrix.mat4.create();
-        // var pmLoc = gl.getUniformLocation(program2, 'projectionMatrix');
-        // var pm = glMatrix.mat4.create();
-        // var camera = {
-        //     x: 0.0,
-        //     y: 0.0,
-        //     z: 0.0
-        // };
-        // glMatrix.mat4.lookAt(vm,
-        //     glMatrix.vec3.fromValues(0.0, 0.0, 0.0),  //posisi kamera
-        //     glMatrix.vec3.fromValues(0.0, 0.0, -2.0), //titik lihat
-        //     glMatrix.vec3.fromValues(0.0, 1.0, 0.0),  //arah atas kamera
-        // );
-        // glMatrix.mat4.perspective(pm,
-        //     glMatrix.glMatrix.toRadian(90), // fovy dalam radian
-        //     canvas.width / canvas.height, // aspect ratio
-        //     0.5, // near
-        //     10.0, // far
-        // );
-        // gl.uniformMatrix4fv(vmLoc, false, vm);
-        // gl.uniformMatrix4fv(pmLoc, false, pm);
 
         theta += thetaSpeed;
-        if (axis[z]) glMatrix.mat4.rotateZ(mm, mm, thetaSpeed);
-        if (axis[y]) glMatrix.mat4.rotateY(mm, mm, thetaSpeed);
-        if (axis[x]) glMatrix.mat4.rotateX(mm, mm, thetaSpeed);
+        if (axis[z]) glMatrix.mat4.rotateZ(mm, mm, thetaSpeed / 2);
+        if (axis[y]) glMatrix.mat4.rotateY(mm, mm, thetaSpeed / 2);
+        if (axis[x]) glMatrix.mat4.rotateX(mm, mm, thetaSpeed / 2);
         gl.uniformMatrix4fv(mmLoc, false, mm);
-        
+
         // Perhitungan modelMatrix untuk vektor normal
         nm = glMatrix.mat3.create();
         glMatrix.mat3.normalFromMat4(nm, mm);
@@ -377,7 +420,7 @@
         );
         gl.uniformMatrix4fv(vmLoc, false, vm);
 
-        gl.drawArrays(gl.TRIANGLES, 0, 36);
+        gl.drawArrays(gl.TRIANGLES, 0, 30);
     }
 
     // Kontrol menggunakan keyboard
@@ -435,7 +478,7 @@
     }
 
     function main() {
-        
+
         document.addEventListener('mousedown', onMouseDown);
         document.addEventListener('mouseup', onMouseUp);
         document.addEventListener('mousemove', onMouseMove);
@@ -457,26 +500,6 @@
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
         resizer();
-        // Uniform untuk tekstur
-        var sampler0Loc = gl.getUniformLocation(program2, 'sampler0');
-        gl.uniform1i(sampler0Loc, 0);
 
-        // Create a texture.
-        var texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-
-        // Fill the texture with a 1x1 blue pixel.
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-            new Uint8Array([0, 0, 255, 255]));
-
-        // Asynchronously load an image
-        var image = new Image();
-        image.src = "images/txStainglass.bmp";
-        image.addEventListener('load', function () {
-            // Now that the image has loaded make copy it to the texture.
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-            gl.generateMipmap(gl.TEXTURE_2D);
-        });
     }
 })();
