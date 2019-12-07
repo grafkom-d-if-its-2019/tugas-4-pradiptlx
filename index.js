@@ -17,7 +17,7 @@
 
     var moving = [0.0, 0.0, 0.0];
     var theta = [0.0, 0.0, 0.0];
-    var xAdd = 0.02;
+    var xAdd = 0.04;
     var yAdd = 0.003;
     var zAdd = 0.004;
     var lineVertices, cubeVertices, cubePoints, cubeColors, cubeVertices, cubeNormals;
@@ -308,37 +308,37 @@
         gl.uniform1f(scaleLoc, scale);
 
         // Uniform untuk pencahayaan
-        var dcLoc = gl.getUniformLocation(program, 'lightColor');
-        var ddLoc = gl.getUniformLocation(program, 'lightPosition');
-        var acLoc = gl.getUniformLocation(program, 'ambientColor');
+        dcLoc = gl.getUniformLocation(program, 'lightColor');
+        ddLoc = gl.getUniformLocation(program, 'lightPosition');
+        acLoc = gl.getUniformLocation(program, 'ambientColor');
         var shine = gl.getUniformLocation(program, 'shininess');
         var s = 0.06;
-        var lightColor = [2., 2., 2.];
+        dc = glMatrix.vec3.fromValues(1.0, 1.0, 1.0);  // rgb
         // var lightPosition = [0., 0., -1.];
         ac = glMatrix.vec3.fromValues(0.17, 0.01, 1.81);
-        gl.uniform3fv(dcLoc, lightColor);
+        gl.uniform3fv(dcLoc, dc);
         gl.uniform3fv(ddLoc, moving);
         gl.uniform3fv(acLoc, ac);
         gl.uniform1f(shine, s);
 
         // Definisi untuk matrix view dan projection
-        var vmLocFont = gl.getUniformLocation(program, 'viewMatrix');
-        var vmFont = glMatrix.mat4.create();
-        var pmLocFont = gl.getUniformLocation(program, 'projectionMatrix');
-        var pmFont = glMatrix.mat4.create();
-        glMatrix.mat4.lookAt(vmFont,
-            glMatrix.vec3.fromValues(0.0, 0.0, 0.0),  //posisi kamera
+        vmLoc = gl.getUniformLocation(program, 'viewMatrix');
+        vm = glMatrix.mat4.create();
+        pmLoc = gl.getUniformLocation(program, 'projectionMatrix');
+        pm = glMatrix.mat4.create();
+        glMatrix.mat4.lookAt(vm,
+            glMatrix.vec3.fromValues(0.0, 0.0, 1.5),  //posisi kamera
             glMatrix.vec3.fromValues(0.0, 0.0, -2.0), //titik lihat
             glMatrix.vec3.fromValues(0.0, 1.0, 0.0),  //arah atas kamera
         );
-        glMatrix.mat4.perspective(pmFont,
+        glMatrix.mat4.perspective(pm,
             glMatrix.glMatrix.toRadian(90), // fovy dalam radian
             canvas.width / canvas.height, // aspect ratio
             0.5, // near
             10.0, // far
         );
-        gl.uniformMatrix4fv(vmLocFont, false, vmFont);
-        gl.uniformMatrix4fv(pmLocFont, false, pmFont);
+        gl.uniformMatrix4fv(vmLoc, false, vm);
+        gl.uniformMatrix4fv(pmLoc, false, pm);
 
         gl.drawArrays(gl.LINES, 0, lineVertices.length / 6);
     }
@@ -353,7 +353,7 @@
         gl.uniform3fv(dcLoc, dc);
 
         ddLoc = gl.getUniformLocation(program2, 'diffusePosition');
-        dd = glMatrix.vec3.fromValues(moving);  // xyz
+        // dd = glMatrix.vec3.fromValues(moving);  // xyz
         gl.uniform3fv(ddLoc, moving);
 
         acLoc = gl.getUniformLocation(program2, 'ambientColor');
@@ -367,11 +367,11 @@
         vm = glMatrix.mat4.create();
         pmLoc = gl.getUniformLocation(program2, 'projectionMatrix');
         pm = glMatrix.mat4.create();
-        camera = { x: 0.0, y: 0.0, z: -0.5 };
+        camera = { x: 0.0, y: 0.0, z: 1.4 };
         glMatrix.mat4.perspective(pm,
             glMatrix.glMatrix.toRadian(90), // fovy dalam radian
             canvas.width / canvas.height,     // aspect ratio
-            0.5,  // near
+            0.1,  // near
             10.0, // far
         );
         gl.uniformMatrix4fv(pmLoc, false, pm);
@@ -386,7 +386,7 @@
         nmLoc = gl.getUniformLocation(program2, 'normalMatrix');
         mmLoc = gl.getUniformLocation(program2, 'modelMatrix');
         mm = glMatrix.mat4.create();
-        glMatrix.mat4.translate(mm, mm, [0.0, 0.0, -2.0]);
+        // glMatrix.mat4.translate(mm, mm, [0.0, 0.0, 0.0]);
 
         glMatrix.mat4.rotateZ(mm, mm, theta[xAxis]);
         glMatrix.mat4.rotateY(mm, mm, theta[yAxis]);
