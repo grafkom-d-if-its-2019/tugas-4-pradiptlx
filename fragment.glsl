@@ -39,7 +39,7 @@ void main() {
     specular = lightColor * lightIntensity;
     diffuse = diffuse * (1. - lightIntensity);
   }else{
-    specular = vec3(0., 1., 0.);
+    specular = vec3(1., 1., 1.);
   }
 
   gl_FragColor = vec4(ambient + diffuse + specular, 1.0);

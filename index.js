@@ -84,12 +84,17 @@
             const internalFormat = gl.RGBA;
             const srcFormat = gl.RGBA;
             const srcType = gl.UNSIGNED_BYTE;
-            image.src = "images/txStainglass.bmp";
+            image.src = "images/texture.jpg";
             image.addEventListener('load', function () {
                 // Now that the image has loaded make copy it to the texture.
                 gl.bindTexture(gl.TEXTURE_2D, texture);
                 gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, srcFormat, srcType, border = image);
                 gl.generateMipmap(gl.TEXTURE_2D);
+                gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                
             });
 
 
@@ -304,7 +309,7 @@
 
         if (scale >= 1) membesar = -1;
         else if (scale <= -1) membesar = 1;
-        scale = scale + (membesar * 0.0119);
+        scale = scale + (membesar * 0.011);
         gl.uniform1f(scaleLoc, scale);
 
         // Uniform untuk pencahayaan
@@ -313,8 +318,8 @@
         acLoc = gl.getUniformLocation(program, 'ambientColor');
         var shine = gl.getUniformLocation(program, 'shininess');
         var s = 0.06;
-        dc = glMatrix.vec3.fromValues(1.0, 1.0, 1.0);  // rgb
-        // var lightPosition = [0., 0., -1.];
+        dc = glMatrix.vec3.fromValues(0.0, 1.0, 1.0);  // rgb
+        var lightPosition = [0., 0., -1.];
         ac = glMatrix.vec3.fromValues(0.17, 0.01, 1.81);
         gl.uniform3fv(dcLoc, dc);
         gl.uniform3fv(ddLoc, moving);
@@ -402,20 +407,20 @@
     }
 
     // Kontrol menggunakan keyboard
-    function onKeyDown(event) {
-        if (event.keyCode == 173) thetaSpeed -= 0.01;       // key '-'
-        else if (event.keyCode == 61) thetaSpeed += 0.01;  // key '='
-        else if (event.keyCode == 48) thetaSpeed = 0;       // key '0'
-        if (event.keyCode == 88) axis[xAxis] = !axis[xAxis];
-        if (event.keyCode == 89) axis[yAxis] = !axis[yAxis];
-        if (event.keyCode == 90) axis[zAxis] = !axis[zAxis];
-        if (event.keyCode == 38) camera.z -= 0.1;
-        else if (event.keyCode == 40) camera.z += 0.1;
-        if (event.keyCode == 37) camera.x -= 0.1;
-        else if (event.keyCode == 39) camera.x += 0.1;
+    // function onKeyDown(event) {
+    //     if (event.keyCode == 173) thetaSpeed -= 0.01;       // key '-'
+    //     else if (event.keyCode == 61) thetaSpeed += 0.01;  // key '='
+    //     else if (event.keyCode == 48) thetaSpeed = 0;       // key '0'
+    //     if (event.keyCode == 88) axis[xAxis] = !axis[xAxis];
+    //     if (event.keyCode == 89) axis[yAxis] = !axis[yAxis];
+    //     if (event.keyCode == 90) axis[zAxis] = !axis[zAxis];
+    //     if (event.keyCode == 38) camera.z -= 0.1;
+    //     else if (event.keyCode == 40) camera.z += 0.1;
+    //     if (event.keyCode == 37) camera.x -= 0.1;
+    //     else if (event.keyCode == 39) camera.x += 0.1;
 
-    }
-    document.addEventListener('keydown', onKeyDown);
+    // }
+    // document.addEventListener('keydown', onKeyDown);
 
     // Kontrol menggunakan mouse
     var dragging, lastx, lasty;
@@ -477,6 +482,8 @@
 
         drawA();
         // requestAnimationFrame(draw);
+        // gl.NEAREST is also allowed, instead of gl.LINEAR, as neither mipmap.
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
         resizer();

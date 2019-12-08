@@ -25,7 +25,7 @@ void main() {
   float lightIntensity = dot(normal, lightDirection);
   lightIntensity = clamp(lightIntensity, 0.0, 1.0);
 
-  vec3 diffuse = vec3(tex0) * lightIntensity;
+  vec3 diffuse = vec3(tex0) * lightIntensity * 2.;
 
   vec3 reflection = 2. * dot(normal, lightDirection) * normal - lightDirection;
 
@@ -39,8 +39,8 @@ void main() {
 
   vec3 specular;
   if (lightIntensity > 0.0){
-    specular = diffuseColor * lightIntensity;
-    diffuse = diffuse * (1. - lightIntensity);
+    specular = diffuseColor * (1.2 - lightIntensity);
+    // diffuse = diffuse * (2. - lightIntensity);
   }else{
     specular = vec3(0., 0., 0.);
   }
