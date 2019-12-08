@@ -17,7 +17,7 @@
 
     var moving = [0.0, 0.0, 0.0];
     var theta = [0.0, 0.0, 0.0];
-    var xAdd = 0.04;
+    var xAdd = 0.004;
     var yAdd = 0.003;
     var zAdd = 0.004;
     var lineVertices, cubeVertices, cubePoints, cubeColors, cubeVertices, cubeNormals;
@@ -67,16 +67,14 @@
             gl.enableVertexAttribArray(vPosition);
             gl.enableVertexAttribArray(vColor);
         } else if (shape == 'cube') {
-
-            // Tell WebGL we want to affect texture unit 0
-            gl.activeTexture(gl.TEXTURE0);
-
             // Uniform untuk tekstur
             var sampler0Loc = gl.getUniformLocation(program2, 'sampler0');
             gl.uniform1i(sampler0Loc, 0);
 
             // Create a texture.
             var texture = gl.createTexture();
+            // Tell WebGL we want to affect texture unit 0
+            gl.activeTexture(gl.TEXTURE0);
 
             // Asynchronously load an image
             var image = new Image();
@@ -89,7 +87,7 @@
                 // Now that the image has loaded make copy it to the texture.
                 gl.bindTexture(gl.TEXTURE_2D, texture);
                 gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, srcFormat, srcType, border = image);
-                gl.generateMipmap(gl.TEXTURE_2D);
+                // gl.generateMipmap(gl.TEXTURE_2D);
                 gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
